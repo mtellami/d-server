@@ -1,5 +1,5 @@
 NAME=server
-SRC=main.go resp.go
+SRC=main.go resp.go handler.go
 
 all: build
 
