@@ -1,9 +1,8 @@
-# DATABASE SERVER
 # CACHING SERVER
 
 - Redis serialization protocol specification (RESP)
 
-- Handle:
+- Commands:
  + PING
  + SET
  + GET

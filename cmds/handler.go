@@ -4,8 +4,8 @@ import "sync"
 
 var Handlers = map[string]func([]Value) Value {
 	"PING": ping,
-	"SET": set,
-	"GET": get,
+	"SET": 	set,
+	"GET": 	get,
 	"HSET": hset,
 	"HGET": hget,
 }
