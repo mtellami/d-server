@@ -10,12 +10,15 @@ Resis is database server written in Golang inspired by Redis using serialization
      \/     \/              \/ 
 ```
 
-## Build
+## RUN
+```zsh
+go run main.go
+```
 
+## Build
 ```zsh
 go build -o resis main.go
 ```
-- 
 
 ## Commands:
 - [ ] PING
