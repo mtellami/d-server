@@ -1,5 +1,5 @@
-# RESIS / DATABASE SERVER
-Resis is database server written in Golang inspired by Redis using serialization protocol specification (RESP).
+# SERIS / DATABASE SERVER
+Seris is database server written in Golang inspired by Redis using serialization protocol specification (RESP).
 
 ```go
                     .__        
