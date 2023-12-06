@@ -1,6 +1,17 @@
 package seris
 
-import "sync"
+import (
+	"bufio"
+	"sync"
+)
+
+const (
+	STRING 	= '+'
+	ERROR		= '-'
+	INTEGER = ':'
+	BULK 		= '$'
+	ARRAY 	= '*'
+)
 
 type Config struct {
 	Port 			int
@@ -16,4 +27,16 @@ type Server struct {
 
 type CommandHandler struct {
 	Handler func() error
+}
+
+type Resp struct {
+	reader *bufio.Reader
+}
+
+type Value struct {
+	typ	 	string
+	str 	string
+	num 	int
+	bulk 	string
+	array []Value
 }
