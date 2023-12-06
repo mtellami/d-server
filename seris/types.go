@@ -2,6 +2,7 @@ package seris
 
 import (
 	"bufio"
+	"io"
 	"sync"
 )
 
@@ -31,6 +32,10 @@ type CommandHandler struct {
 
 type Resp struct {
 	reader *bufio.Reader
+}
+
+type Writer struct {
+	writer io.Writer
 }
 
 type Value struct {
