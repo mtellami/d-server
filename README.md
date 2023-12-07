@@ -22,11 +22,15 @@ go build -o resis main.go
 
 ## Commands:
 - [x] PING
-- [ ] SET
-- [ ] GET
+- [x] SET
+- [x] GET
 - [ ] DEL
 - [ ] HSET
 - [ ] HGET
 - [ ] HDEL
 - [ ] HGETALL
 - [ ] HLEN
+
+## To-Do
+- [ ] GoRoutines / Threads - Mutex
+- [ ] AOF / Append Only File - Persist Data

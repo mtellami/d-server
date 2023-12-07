@@ -23,7 +23,12 @@ type Config struct {
 type Server struct {
 	conf 			*Config
 	handlers 	map[string]func([]Value) Value
+}
+
+type Data struct {
 	mu 				sync.RWMutex
+	SETs 			map[string]string
+	HSETs 		map[string]map[string]string
 }
 
 type Reader struct {
