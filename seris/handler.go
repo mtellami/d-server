@@ -1,5 +1,9 @@
 package seris
 
+import (
+	"strconv"
+)
+
 var memory = Data{
 	SETs: map[string]string{},
 	HSETs: map[string]map[string]string{},
@@ -9,6 +13,7 @@ var defaultHandlers = map[string]func([]Value) Value {
 	"PING": ping,
 	"SET": set,
 	"GET": get,
+	"DEL": del,
 	"HSET": hset,
 	"HGET": hget,
 }
@@ -77,5 +82,24 @@ func hget(args []Value) Value {
 	}
 
 	return Value{typ: "bulk", bulk: value}
+}
+
+func del(args []Value) Value {
+	if len(args) == 0 {
+		return Value{typ: "error", str: "ERR wrong number of arguments for 'del' command"}
+	}
+
+	n := 0
+	for i := 0; i < len(args); i++ {
+		key := args[i].bulk
+
+		_, ok := memory.SETs[key]
+		if ok {
+			n += 1
+			delete(memory.SETs, key)
+		}
+	}
+
+	return Value{typ: "string", str: strconv.Itoa(n)}
 }
 

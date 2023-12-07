@@ -24,7 +24,7 @@ go build -o resis main.go
 - [x] PING
 - [x] SET
 - [x] GET
-- [ ] DEL
+- [x] DEL
 - [x] HSET
 - [x] HGET
 - [ ] HDEL
