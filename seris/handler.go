@@ -1,5 +1,10 @@
 package seris
 
-var defaultHandlers = map[string]CommandHandler {
+var defaultHandlers = map[string]func([]Value) Value {
+	"PING": ping,
+}
+
+func ping(args []Value) Value {
+	return Value{typ: "string", str: "PONG"}
 }
 

@@ -8,11 +8,11 @@ import (
 )
 
 // RESP READER
-func NewResp(rd io.Reader) *Resp {
-	return &Resp{reader: bufio.NewReader(rd)}
+func NewReader(rd io.Reader) *Reader {
+	return &Reader{reader: bufio.NewReader(rd)}
 }
 
-func (resp *Resp) readLine() (line []byte, n int, err error) {
+func (resp *Reader) readLine() (line []byte, n int, err error) {
 	for {
 		b, err := resp.reader.ReadByte()
 		if err != nil {
@@ -28,7 +28,7 @@ func (resp *Resp) readLine() (line []byte, n int, err error) {
 	return line[:len(line) - 2], n, nil
 }
 
-func (resp *Resp) readInteger() (x int, n int, err error) {
+func (resp *Reader) readInteger() (x int, n int, err error) {
 	line, n, err := resp.readLine()
 	if err != nil {
 		return 0, 0, err
@@ -43,7 +43,7 @@ func (resp *Resp) readInteger() (x int, n int, err error) {
 }
 
 // RESP PARSER
-func (resp *Resp) Read() (Value, error) {
+func (resp *Reader) Read() (Value, error) {
 	_t, err := resp.reader.ReadByte()
 	if err != nil {
 		return Value{}, err
@@ -61,7 +61,7 @@ func (resp *Resp) Read() (Value, error) {
 }
 
 // RESP ARRAY PARSER
-func (resp *Resp) readArray() (Value, error) {
+func (resp *Reader) readArray() (Value, error) {
 	v := Value{
 		typ: "array",
 	}
@@ -85,7 +85,7 @@ func (resp *Resp) readArray() (Value, error) {
 }
 
 // RESP BULK PARSER
-func (resp *Resp) readBulk() (Value, error) {
+func (resp *Reader) readBulk() (Value, error) {
 	v := Value{
 		typ: "bulk",
 	}

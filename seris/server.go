@@ -1,14 +1,16 @@
 package seris
 
 import (
+	"errors"
 	"fmt"
 	"io"
 	"net"
+	"strings"
 )
 
 // Create new Server
 func NewServer(config *Config) *Server {
-	handlers := make(map[string]CommandHandler)
+	handlers := make(map[string]func([]Value) Value)
 
 	for command, handler := range defaultHandlers {
 		handlers[command] = handler
@@ -24,28 +26,27 @@ func NewServer(config *Config) *Server {
 
 // Listen and accept connections
 func (server *Server) Listen() error {
-	fmt.Println("Server Listening on port:", server.conf.Port)
+	port := server.conf.Port
+	fmt.Println("Server Listening on port:", port)
 
-	ln, err := net.Listen("tcp", fmt.Sprintf(":%d", server.conf.Port))
+	ln, err := net.Listen("tcp", fmt.Sprintf(":%d", port))
 	if err != nil {
 		return err
 	}
 	defer ln.Close()
 
-	conn, err := ln.Accept()
+	connection, err := ln.Accept()
 	if err != nil {
 		fmt.Println(err)
 		return err
 	}
-	defer conn.Close()
+	defer connection.Close()
 
 	for {
-		err = server.handleConn(conn)
-		if err != nil {
-			if err == io.EOF {
-				fmt.Println(err)
-				break
-			}
+		err = server.handleConn(connection)
+		if err == io.EOF {
+			break
+		} else if err != nil {
 			fmt.Println(err)
 		}
 	}
@@ -53,16 +54,31 @@ func (server *Server) Listen() error {
 }
 
 // Handle connections
-func (server *Server) handleConn(conn net.Conn) error {
-	// Request
-	buf := make([]byte, 1024)
-	_, err := conn.Read(buf)
+func (server *Server) handleConn(connection net.Conn) error {
+	reader := NewReader(connection)
+
+	value, err := reader.Read()
 	if err != nil {
 		return err
 	}
 
-	// Response
-	conn.Write([]byte("+OK\r\n"))
+	if value.typ != "array" || len(value.array) == 0 {
+		return errors.New("Invalid request, expected array")
+	}
+
+	command := strings.ToUpper(value.array[0].bulk)
+	args := value.array[1:]
+
+	writer := NewWriter(connection)
+
+	handler, ok := server.handlers[command]
+	if !ok {
+		writer.Write(Value{typ: "string", str: ""})
+		return errors.New(fmt.Sprintf("Invalid command: %s", command))
+	}
+
+	result := handler(args)
+	writer.Write(result)
 
 	return nil
 }

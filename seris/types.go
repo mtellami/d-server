@@ -22,15 +22,11 @@ type Config struct {
 
 type Server struct {
 	conf 			*Config
-	handlers 	map[string]CommandHandler
+	handlers 	map[string]func([]Value) Value
 	mu 				sync.RWMutex
 }
 
-type CommandHandler struct {
-	Handler func() error
-}
-
-type Resp struct {
+type Reader struct {
 	reader *bufio.Reader
 }
 

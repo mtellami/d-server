@@ -21,7 +21,7 @@ go build -o resis main.go
 ```
 
 ## Commands:
-- [ ] PING
+- [x] PING
 - [ ] SET
 - [ ] GET
 - [ ] DEL
