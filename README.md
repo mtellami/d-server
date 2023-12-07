@@ -27,9 +27,8 @@ go build -o resis main.go
 - [x] DEL
 - [x] HSET
 - [x] HGET
-- [ ] HDEL
-- [ ] HGETALL
-- [ ] HLEN
+- [x] HGETALL
+- [x] HDEL
 
 ## To-Do
 - [ ] GoRoutines / Threads - Mutex
