@@ -1,11 +1,16 @@
 package seris
 
-var memory Data
+var memory = Data{
+	SETs: map[string]string{},
+	HSETs: map[string]map[string]string{},
+}
 
 var defaultHandlers = map[string]func([]Value) Value {
 	"PING": ping,
 	"SET": set,
 	"GET": get,
+	"HSET": hset,
+	"HGET": hget,
 }
 
 func ping(args []Value) Value {

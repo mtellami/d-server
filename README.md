@@ -25,8 +25,8 @@ go build -o resis main.go
 - [x] SET
 - [x] GET
 - [ ] DEL
-- [ ] HSET
-- [ ] HGET
+- [x] HSET
+- [x] HGET
 - [ ] HDEL
 - [ ] HGETALL
 - [ ] HLEN
