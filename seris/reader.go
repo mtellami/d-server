@@ -44,18 +44,18 @@ func (resp *Reader) readInteger() (x int, n int, err error) {
 
 // RESP PARSER
 func (resp *Reader) Read() (Value, error) {
-	_t, err := resp.reader.ReadByte()
+	_type, err := resp.reader.ReadByte()
 	if err != nil {
 		return Value{}, err
 	}
 
-	switch _t {
+	switch _type {
 	case ARRAY:
 		return resp.readArray()
 	case BULK:
 		return resp.readBulk()
 	default:
-		fmt.Printf("Unknown type: %v", string(_t))
+		fmt.Printf("Unknown type: %v", string(_type))
 		return Value{}, nil
 	}
 }

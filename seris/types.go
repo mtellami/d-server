@@ -3,6 +3,7 @@ package seris
 import (
 	"bufio"
 	"io"
+	"os"
 	"sync"
 )
 
@@ -20,9 +21,14 @@ type Config struct {
 	AofFile 	string
 }
 
+type Aof struct {
+	file 	*os.File
+	rd 		*bufio.Reader
+}
+
 type Server struct {
 	conf 			*Config
-	handlers 	map[string]func([]Value) Value
+	aof 			*Aof
 }
 
 type Data struct {

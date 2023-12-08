@@ -31,5 +31,5 @@ go build -o resis main.go
 - [x] HDEL
 
 ## To-Do
-- [ ] GoRoutines / Threads - Mutex
-- [ ] AOF / Append Only File - Persist Data
+- [ ] Multiple Clinets / GoRoutines / Threads - Mutex
+- [x] AOF / Append Only File - Data Persistence

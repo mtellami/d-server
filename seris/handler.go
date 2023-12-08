@@ -1,5 +1,11 @@
 package seris
 
+import (
+	"errors"
+	"fmt"
+	"strings"
+)
+
 var memory = Data{
 	SETs: map[string]string{},
 	HSETs: map[string]map[string]string{},
@@ -143,4 +149,17 @@ func hdel(args []Value) Value {
 	}
 
 	return Value{typ: "integer", num: n}
+}
+
+// Commands execution
+func execute(value Value) (Value, error) {
+	command := strings.ToUpper(value.array[0].bulk)
+	args := value.array[1:]
+
+	handler, ok := defaultHandlers[command]
+	if !ok {
+		return Value{typ: "string", str: ""}, errors.New(fmt.Sprintf("Invalid command: %s", command))
+	}
+
+	return handler(args), nil
 }

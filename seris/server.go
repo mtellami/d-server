@@ -9,19 +9,23 @@ import (
 )
 
 // Create new Server
-func NewServer(config *Config) *Server {
-	handlers := make(map[string]func([]Value) Value)
+func NewServer(config *Config) (*Server, error) {
 
-	for command, handler := range defaultHandlers {
-		handlers[command] = handler
+	if config.EnableAof {
+		aof, err := NewAof(config.AofFile)
+		if err != nil {
+			fmt.Println(err)
+			return nil, err
+		}
+		r := aof.Read()
+		if r != nil {
+			fmt.Println(r)
+			return nil, r
+		}
+		return &Server{conf: config, aof: aof}, nil
 	}
 
-	server := &Server{
-		handlers: handlers,
-		conf: config,
-	}
-
-	return server
+	return &Server{conf: config}, nil
 }
 
 // Listen and accept connections
@@ -31,6 +35,7 @@ func (server *Server) Listen() error {
 
 	ln, err := net.Listen("tcp", fmt.Sprintf(":%d", port))
 	if err != nil {
+		fmt.Println(err)
 		return err
 	}
 	defer ln.Close()
@@ -41,6 +46,7 @@ func (server *Server) Listen() error {
 		return err
 	}
 	defer connection.Close()
+	defer server.aof.Close()
 
 	for {
 		err = server.handleConn(connection)
@@ -55,8 +61,9 @@ func (server *Server) Listen() error {
 
 // Handle connections
 func (server *Server) handleConn(connection net.Conn) error {
-	reader := NewReader(connection)
 
+	// REQUEST
+	reader := NewReader(connection)
 	value, err := reader.Read()
 	if err != nil {
 		return err
@@ -66,19 +73,24 @@ func (server *Server) handleConn(connection net.Conn) error {
 		return errors.New("Invalid request, expected array")
 	}
 
+	// EXECUTE 
 	command := strings.ToUpper(value.array[0].bulk)
-	args := value.array[1:]
-
-	writer := NewWriter(connection)
-
-	handler, ok := server.handlers[command]
-	if !ok {
-		writer.Write(Value{typ: "string", str: ""})
-		return errors.New(fmt.Sprintf("Invalid command: %s", command))
+	response, err := execute(value)
+	if err != nil {
+		fmt.Println(err)
 	}
 
-	result := handler(args)
-	writer.Write(result)
+	// RESPONSE
+	writer := NewWriter(connection)
+	writer.Write(response)
+
+	// SAVE
+	if command == "SET" || command == "HSET" {
+		err := server.aof.Write(value)
+		if err != nil {
+			return err
+		}
+	}
 
 	return nil
 }
