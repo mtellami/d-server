@@ -40,27 +40,38 @@ func (server *Server) Listen() error {
 	}
 	defer ln.Close()
 
-	connection, err := ln.Accept()
-	if err != nil {
-		fmt.Println(err)
-		return err
+	if server.conf.EnableAof {
+		defer server.aof.Close()
 	}
-	defer connection.Close()
-	defer server.aof.Close()
 
 	for {
-		err = server.handleConn(connection)
+		connection, err := ln.Accept()
+		if err != nil {
+			fmt.Println(err)
+			return err
+		}
+
+		// GoRoutine for every client
+		go response(server, connection)
+	}
+}
+
+// Client Thread
+func response(server *Server, connection net.Conn) {
+	defer connection.Close()
+
+	for {
+		err := server.serv(connection)
 		if err == io.EOF {
 			break
 		} else if err != nil {
 			fmt.Println(err)
 		}
 	}
-	return nil
 }
 
 // Handle connections
-func (server *Server) handleConn(connection net.Conn) error {
+func (server *Server) serv(connection net.Conn) error {
 
 	// REQUEST
 	reader := NewReader(connection)
@@ -85,7 +96,7 @@ func (server *Server) handleConn(connection net.Conn) error {
 	writer.Write(response)
 
 	// SAVE
-	if command == "SET" || command == "HSET" {
+	if server.conf.EnableAof && command == "SET" || command == "HSET" {
 		err := server.aof.Write(value)
 		if err != nil {
 			return err

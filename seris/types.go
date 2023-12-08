@@ -24,6 +24,7 @@ type Config struct {
 type Aof struct {
 	file 	*os.File
 	rd 		*bufio.Reader
+	mu  	sync.Mutex
 }
 
 type Server struct {
@@ -33,6 +34,7 @@ type Server struct {
 
 type Data struct {
 	mu 				sync.RWMutex
+	hmu 			sync.RWMutex
 	SETs 			map[string]string
 	HSETs 		map[string]map[string]string
 }

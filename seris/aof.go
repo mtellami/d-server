@@ -3,6 +3,7 @@ package seris
 import (
 	"bufio"
 	"os"
+	"time"
 )
 
 func NewAof(path string) (*Aof, error) {
@@ -11,16 +12,35 @@ func NewAof(path string) (*Aof, error) {
 		return nil, err
 	}
 
-	// File sync latter on GoRoutine every 5 Sec
-	return &Aof{file: file, rd: bufio.NewReader(file)}, nil
+	aof := &Aof{
+		file: file,
+		rd: 	bufio.NewReader(file),
+	}
+
+	// GoRoutine to Sync AOF buffer to disk
+	go func() {
+		for {
+			aof.mu.Lock()
+			aof.file.Sync()
+			aof.mu.Unlock()
+			time.Sleep(time.Second * 5)
+		}
+	}()
+
+	return aof, nil
 }
 
 func (aof *Aof) Close() error {
-	// Mutexi
+	aof.mu.Lock()
+	defer aof.mu.Unlock()
+
 	return aof.file.Close()
 }
 
 func (aof *Aof) Write(value Value) error {
+	aof.mu.Lock()
+	defer aof.mu.Unlock()
+
 	_, err := aof.file.Write(value.Marshal())
 	if err != nil {
 		return err
