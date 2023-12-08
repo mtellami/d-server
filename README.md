@@ -20,7 +20,49 @@ go run main.go
 go build -o resis main.go
 ```
 
-## Commands:
+## Usage
+- Initialize seris server
+```go
+package main
+
+import (
+	"fmt"
+	"seris/seris"
+)
+
+func main() {
+
+	server, err := seris.NewServer(&seris.Config{
+		Port: 6379,
+		EnableAof: true,
+		AofFile: "database.aof",
+	})
+
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	server.Listen()
+}
+```
+
+- Connect to the server using a redis client
+```zsh
+$ redis-cli
+```
+
+## Data Persistence
+- Enable / Desable data save on dist
+```go
+Config {
+    EnableAof: false
+    ...
+}
+```
+
+
+## Supported Commands:
 - [x] PING
 - [x] SET
 - [x] GET
@@ -28,8 +70,5 @@ go build -o resis main.go
 - [x] HSET
 - [x] HGET
 - [x] HGETALL
+- [ ] HLEN
 - [x] HDEL
-
-## To-Do
-- [x] Multiple Clinets / GoRoutines / Threads - Mutex
-- [x] AOF / Append Only File - Data Persistence
